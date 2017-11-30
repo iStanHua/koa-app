@@ -1,24 +1,22 @@
-const key = "koaapp"
+const key = 'koa'
 const crypto = require('crypto')
 module.exports = {
-    md5AddSalt: function (password) {
-        var salt = Math.floor(Math.random() * 100);
-        var decipher = crypto.createHash('md5', key);
-        var md5Pass = decipher.update(password + "" + salt).digest("hex");
-        return {
-            salt: salt,
-            md5Pass: md5Pass
-        };
-    },
-    md5: function (password) {
-        var md5Pass = crypto.createHash('md5').update(password).digest("hex");
-        return md5Pass
-    },
-    md5Salt: function (password, salt) {
-        if (salt == null) {
-            salt = '';
+    md5: function (password, salt) {
+        let _pass = password
+        let decipher = crypto.createHash('md5')
+        if (salt) {
+            decipher = crypto.createHash('md5', key)
+            _pass = password + salt
         }
-        var decipher = crypto.createHash('md5', key);
-        return decipher.update(password + salt).digest("hex");
+        let _md5 = decipher.update(_pass).digest('hex')
+        if (salt) {
+            return {
+                salt: salt,
+                password: _md5
+            }
+        }
+        else {
+            return _md5
+        }
     }
 }

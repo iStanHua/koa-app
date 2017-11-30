@@ -1,12 +1,11 @@
 // Seed the data
-const sequelize_fixtures = require('sequelize-fixtures');
+const sequelize_fixtures = require('sequelize-fixtures')
 
-var path = require('path');
-var models = require('../models/');
+const path = require('path')
+const models = require('../models/')
 
 sequelize_fixtures.loadFiles([
-	'./seeders/authors.js',
-	'./seeders/books.js'
+	'./seeders/user.js'
 ], models).then(function () {
-	console.log('Seed data loaded!');
+	console.log('Seed data loaded!')
 });
