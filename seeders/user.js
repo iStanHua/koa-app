@@ -5,19 +5,21 @@ module.exports = [
     {
         "model": "user",
         "data": {
-            "name": "zqh",
-            "gender": "male",
+            "name": "admin",
+            "gender": 1,
             "password": md5.md5('123456'),
-            "email": "1764918@qq.com",
+            "phoneNumber": 15000000000,
+            "email": "admin@koa.com"
         }
     },
     {
         "model": "user",
         "data": {
-            "name": "George",
-            "gender": "male",
+            "name": "zqh",
+            "gender": 1,
             "password": md5.md5('123456'),
-            "email": "235435346@qq.com",
+            "phoneNumber": 15000000001,
+            "email": "zqh@koa.com"
         }
     }
 ]

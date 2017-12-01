@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const fs = require('fs')
 const path = require('path')
@@ -20,37 +20,32 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
   },
   define: {
     timestamps: false
-  },
-  logging: function (str) {
-    fs.appendFile('../logs/dblog/db.log', str + '\n', () => {
-      console.log(str)
-    })
-  },
+  }
 })
 
 sequelize.authenticate()
-  .then(function () {
-    console.log('Connection has been established successfully.')
+  .then(() => {
+    console.log('连接已成功建立.')
   })
-  .catch(function (err) {
-    console.log('Unable to connect to the database:', err)
+  .catch((err) => {
+    console.log('无法连接到数据库:', err)
   })
 
 //Load all the models
 fs.readdirSync(__dirname)
-  .filter(function (file) {
+  .filter((file) => {
     return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js')
   })
-  .forEach(function (file) {
+  .forEach((file) => {
     let model = sequelize['import'](path.join(__dirname, file))
     db[model.name] = model
-  });
+  })
 
 Object.keys(db).forEach(function (modelName) {
   if (db[modelName].associate) {
     db[modelName].associate(db)
   }
-});
+})
 
 //Export the db Object
 db.sequelize = sequelize

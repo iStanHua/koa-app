@@ -9,21 +9,20 @@ module.exports = function (sequelize, DataTypes) {
       primaryKey: true
     },
     name: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
+      type: DataTypes.STRING(16),
       unique: true,
       comment: '用户名',
       validate: {
-        len: [3, 20],
+        len: [3, 16],
       },
       get: function () {
         return this.getDataValue('name')
       }
     },
     gender: {
-      type: DataTypes.ENUM('male', 'female', 'unkown'),
-      defaultValue: 'unkown',
-      comment: '性别'
+      type: DataTypes.TINYINT(2),
+      defaultValue: '3',
+      comment: '1:男，2：女，3：未知'
     },
     avatar: {
       type: DataTypes.STRING,
@@ -37,7 +36,6 @@ module.exports = function (sequelize, DataTypes) {
     },
     email: {
       type: DataTypes.STRING(100),
-      allowNull: false,
       unique: true,
       comment: '邮箱',
       validate: {
@@ -46,13 +44,17 @@ module.exports = function (sequelize, DataTypes) {
     },
     phoneNumber: {
       type: DataTypes.STRING(11),
-      allowNull: false,
       unique: true,
       field: 'phone_number',
       comment: '手机号',
       validate: {
-        is: /^1[3|5|6|7|8|9][0,9]{9}$/
+        is: /^1[3|5|6|7|8|9][0-9]{9}$/
       }
+    },
+    active: {
+      type: DataTypes.TINYINT(2),
+      defaultValue: 1,
+      comment: '0:不可用，1:可用'
     },
     createdTime: {
       type: DataTypes.DATE,
@@ -60,10 +62,21 @@ module.exports = function (sequelize, DataTypes) {
       defaultValue: DataTypes.NOW,
       field: 'created_time',
       comment: '创建时间'
+    },
+    updatedTime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      field: 'updated_time',
+      comment: '更新时间'
+    },
+    deletedTime: {
+      type: DataTypes.DATE,
+      field: 'deleted_time',
+      comment: '删除时间'
     }
   }, {
-      tableName: 'user',
-      timestamps: false,
+      tableName: 't_user',
       paranoid: true,     // 删除时不进行物理删除
       getterMethods: {},  // 获取时添加一些处理后的参数
       setterMethods: {},  // 存储时进行处理
