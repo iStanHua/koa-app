@@ -22,7 +22,8 @@ module.exports = function (sequelize, DataTypes) {
     },
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      field: 'user_id'
       // references: {
       //   model: 'user',
       //   key: 'id'

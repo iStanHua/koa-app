@@ -1,9 +1,9 @@
-
+const router = require('koa-router')()
 const news = require('../controllers/news')
 
-module.exports = function (router) {
-    router.prefix('/news')
+router.prefix('/api/news')
 
-    router.get('/query', news.query)
-    router.get('/detail/:id', news.detail)
-}
+router.get('/query', news.query)
+router.get('/detail/:id', news.detail)
+
+module.exports = router 

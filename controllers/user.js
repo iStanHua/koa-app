@@ -1,5 +1,5 @@
 
-const user = require('../models/').user
+const user = require('../models').user
 
 const md5 = require('../util/md5')
 
@@ -156,8 +156,8 @@ exports.register = async (ctx, next) => {
     let result = await user.create(_options)
     // _body.data = result
   } catch (e) {
-    ctx.status = 500
-    _body.code = 500
+    ctx.status = e.status || 500
+    _body.code = e.status || 500
     _body.msg = e.message
   } finally {
     ctx.body = _body
@@ -198,8 +198,8 @@ exports.login = async (ctx, next) => {
     let result = await user.findAll(_options)
     _body.data = result
   } catch (e) {
-    ctx.status = 500
-    _body.code = 500
+    ctx.status = e.status || 500
+    _body.code = e.status || 500
     _body.msg = e.message
   } finally {
     ctx.body = _body
@@ -230,8 +230,8 @@ exports.query = async (ctx, next) => {
     _body.data = result
   }
   catch (e) {
-    ctx.status = 500
-    _body.code = 500
+    ctx.status = e.status || 500
+    _body.code = e.status || 500
     _body.msg = e.message
   }
   finally {
@@ -244,16 +244,26 @@ exports.query = async (ctx, next) => {
  * @param {Function} next
  */
 exports.detail = async (ctx, next) => {
-  console.log(ctx)
-  if (typeof ctx.params.id != 'undefined') {
-    let _body = { code: 200, msg: '查询成功' }
+  let { id } = ctx.params
+  id = Number(id)
+  let _body = { code: 200, msg: '查询成功' }
+  if (isNaN(id)) {
+    ctx.status = 400
+    _body.code = 400
+    _body.msg = '参数错误，请重试'
+    ctx.body = _body
+  }
+  else {
     try {
-      let result = await user.findById(ctx.params.id)
+      let result = await user.findById(id)
       _body.data = result
+      if (!result) {
+        _body.msg = `编号为${id}不存在`
+      }
     }
     catch (e) {
-      ctx.status = 500
-      _body.code = 500
+      ctx.status = e.status || 500
+      _body.code = e.status || 500
       _body.msg = e.message
     }
     finally {

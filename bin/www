@@ -88,5 +88,5 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 
-  console.log(`Listening on ${bind} !`);
+  console.log(`Listening on http://127.0.0.1:${addr.port} !`);
 }

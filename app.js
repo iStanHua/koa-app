@@ -10,6 +10,8 @@ const cors = require('koa-cors')
 // 路由mount
 const mount = require('koa-mount')
 
+const routes = require('./routes')
+
 const app = new Koa()
 
 // error handler
@@ -30,18 +32,27 @@ app.use(views(__dirname + '/views', {
 
 // logger
 app.use(async (ctx, next) => {
-  const start = new Date()
-  await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+  try {
+    const start = new Date()
+    await next()
+    const ms = new Date() - start
+    console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+  } catch (err) {
+    if (err.status === 401) {
+      ctx.status = 401
+      ctx.set('WWW-Authenticate', 'Basic')
+      ctx.body = 'cant haz that'
+    } else {
+      throw err
+    }
+  }
 })
 
-// 挂载路由
-app.use(mount('/api', require('./routes')))
+// router
+routes(app)
 
 // error-handling
 app.on('error', (err, ctx) => {
-  logUtil.logError(ctx, err, new Date())
   console.error('server error', err, ctx)
 });
 

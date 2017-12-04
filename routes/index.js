@@ -1,7 +1,10 @@
 
 const router = require('koa-router')()
 
-const user = require('./user')(router)
-const news = require('./news')(router)
+const user = require('./user')
+const news = require('./news')
 
-module.exports = router.middleware()
+module.exports = app => {
+    app.use(user.routes(), user.allowedMethods())
+    app.use(news.routes(), news.allowedMethods())
+}

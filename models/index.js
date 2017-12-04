@@ -47,6 +47,8 @@ Object.keys(db).forEach(function (modelName) {
   }
 })
 
+console.log(db)
+
 //Export the db Object
 db.sequelize = sequelize
 db.Sequelize = Sequelize
