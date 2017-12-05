@@ -1,5 +1,5 @@
-
-const user = require('../models').user
+const db = require('../models')
+const User = db.User
 
 const md5 = require('../util/md5')
 
@@ -37,7 +37,7 @@ const check = {
         resolve('用户名不能为纯数字')
       }
       try {
-        let res = await user.findOne({
+        let res = await User.findOne({
           where: {
             name: value
           }
@@ -69,7 +69,7 @@ const check = {
         resolve('无效的手机号码')
       }
       try {
-        let res = await user.findOne({
+        let res = await User.findOne({
           where: {
             phoneNumber: value
           }
@@ -98,7 +98,7 @@ const check = {
         resolve('邮箱格式有误')
       }
       try {
-        let res = await user.findOne({
+        let res = await User.findOne({
           where: {
             email: value
           }
@@ -153,12 +153,13 @@ exports.register = async (ctx, next) => {
       _body.msg = _msg
       return
     }
-    let result = await user.create(_options)
+    let result = await User.create(_options)
     // _body.data = result
   } catch (e) {
     ctx.status = e.status || 500
     _body.code = e.status || 500
     _body.msg = e.message
+    ctx.app.emit('error', e, ctx)
   } finally {
     ctx.body = _body
   }
@@ -180,7 +181,7 @@ exports.login = async (ctx, next) => {
       _msg = check.password(password)
     }
     _options = {
-      phoneNumber: phone_number,
+      phone_number: phone_number,
       password: password
     }
   }
@@ -195,12 +196,13 @@ exports.login = async (ctx, next) => {
     }
   }
   try {
-    let result = await user.findAll(_options)
+    let result = await User.findAll(_options)
     _body.data = result
   } catch (e) {
     ctx.status = e.status || 500
     _body.code = e.status || 500
     _body.msg = e.message
+    ctx.app.emit('error', e, ctx)
   } finally {
     ctx.body = _body
   }
@@ -226,13 +228,14 @@ exports.query = async (ctx, next) => {
     order: [['created_time', 'DESC']]
   }
   try {
-    let result = await user.findAndCountAll(_options)
+    let result = await User.findAndCountAll(_options)
     _body.data = result
   }
   catch (e) {
     ctx.status = e.status || 500
     _body.code = e.status || 500
     _body.msg = e.message
+    ctx.app.emit('error', e, ctx)
   }
   finally {
     ctx.body = _body
@@ -250,21 +253,67 @@ exports.detail = async (ctx, next) => {
   if (isNaN(id)) {
     ctx.status = 400
     _body.code = 400
-    _body.msg = '参数错误，请重试'
+    _body.msg = 'bad request'
     ctx.body = _body
   }
   else {
     try {
-      let result = await user.findById(id)
+      let result = await User.findById(id)
       _body.data = result
       if (!result) {
-        _body.msg = `编号为${id}不存在`
+        _body.msg = `id=${id} not found`
       }
     }
     catch (e) {
       ctx.status = e.status || 500
       _body.code = e.status || 500
-      _body.msg = e.message
+      _body.msg = 'internal server error'
+      ctx.app.emit('error', e, ctx)
+    }
+    finally {
+      ctx.body = _body
+    }
+  }
+}
+/**
+ * 用户新闻列表
+ * @param {Object} ctx  上下文
+ * @param {Function} next
+ */
+exports.news = async (ctx, next) => {
+  let { id } = ctx.params
+  id = Number(id)
+  let _body = { code: 200, msg: '查询成功' }
+  if (isNaN(id)) {
+    ctx.status = 400
+    _body.code = 400
+    _body.msg = 'bad request'
+    ctx.body = _body
+  }
+  else {
+    try {
+      let _options = {
+        where: {
+          id: id
+        },
+        attributes: {
+          exclude: ['password', 'active', 'deletedTime']
+        },
+        offset: (page_index - 1) * page_size,
+        limit: page_size,
+        order: [['created_time', 'DESC']]
+      }
+      let result = await User.findAll(_options)
+      _body.data = result
+      if (!result) {
+        _body.msg = `id=${id} not found`
+      }
+    }
+    catch (e) {
+      ctx.status = e.status || 500
+      _body.code = e.status || 500
+      _body.msg = 'internal server error'
+      ctx.app.emit('error', e, ctx)
     }
     finally {
       ctx.body = _body

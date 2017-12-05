@@ -1,7 +1,5 @@
-
 const db = require('../models')
-const news = db.news
-const user = db.user
+const News = db.News
 
 const check = {
   /**
@@ -37,7 +35,7 @@ const check = {
         resolve('用户名不能为纯数字')
       }
       try {
-        let res = await news.findOne({
+        let res = await News.findOne({
           where: {
             name: value
           }
@@ -69,7 +67,7 @@ const check = {
         resolve('无效的手机号码')
       }
       try {
-        let res = await news.findOne({
+        let res = await News.findOne({
           where: {
             phoneNumber: value
           }
@@ -98,7 +96,7 @@ const check = {
         resolve('邮箱格式有误')
       }
       try {
-        let res = await news.findOne({
+        let res = await News.findOne({
           where: {
             email: value
           }
@@ -126,28 +124,28 @@ exports.query = async (ctx, next) => {
   let page_size = ctx.request.body.page_size || 10
   let _options = {
     where: {
-      isPublic: 1
+      is_public: 1
     },
     attributes: {
-      exclude: ['isPublic', 'deletedTime']
+      exclude: ['is_public', 'user_id']
     },
     include: [{
-      model: user,
-      where: { id: db.Sequelize.col('news.userId') },
-      attributes: [['name', 'userName'], 'avatar']
+      model: db.User,
+      attributes: ['id', 'name', 'avatar']
     }],
     offset: (page_index - 1) * page_size,
     limit: page_size,
     order: [['created_time', 'DESC']]
   }
   try {
-    let result = await news.findAndCountAll(_options)
+    let result = await News.findAndCountAll(_options)
     _body.data = result
   }
   catch (e) {
     ctx.status = e.status || 500
     _body.code = e.status || 500
-    _body.msg = e.message
+    _body.msg = 'internal server error'
+    ctx.app.emit('error', e, ctx)
   }
   finally {
     ctx.body = _body
@@ -165,21 +163,33 @@ exports.detail = async (ctx, next) => {
   if (isNaN(id)) {
     ctx.status = 400
     _body.code = 400
-    _body.msg = '参数错误，请重试'
+    _body.msg = 'bad request'
     ctx.body = _body
   }
   else {
     try {
-      let result = await news.findById(id)
+      let result = await News.findOne({
+        where: {
+          id: id
+        },
+        attributes: {
+          exclude: ['is_public', 'user_id']
+        },
+        include: [{
+          model: db.User,
+          attributes: ['id', 'name', 'avatar']
+        }],
+      })
       _body.data = result
       if (!result) {
-        _body.msg = `编号为${id}不存在`
+        _body.msg = `id=${id} not found`
       }
     }
     catch (e) {
       ctx.status = e.status || 500
       _body.code = e.status || 500
-      _body.msg = e.message
+      _body.msg = 'internal server error'
+      ctx.app.emit('error', e, ctx)
     }
     finally {
       ctx.body = _body

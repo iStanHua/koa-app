@@ -1,15 +1,9 @@
 //  新闻表
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('news', {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      allowNull: false,
-      unique: true,
-      primaryKey: true
-    },
+  const News = sequelize.define('News', {
     title: {
       type: DataTypes.STRING(100),
+      allowNull: false,
       comment: '标题',
       validate: {
         len: [8, 100],
@@ -20,73 +14,53 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       comment: '内容'
     },
-    userId: {
+    visit_count: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'user_id'
-      // references: {
-      //   model: 'user',
-      //   key: 'id'
-      // }
-    },
-    visitCount: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
       defaultValue: 0,
-      field: 'visit_count',
       comment: '浏览数'
     },
-    likeCount: {
+    like_count: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       defaultValue: 0,
-      field: 'like_count',
       comment: '点赞数'
     },
-    commentCount: {
+    comment_count: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       defaultValue: 0,
-      field: 'comment_count',
       comment: '回复数'
     },
-    allowComment: {
+    allow_comment: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       defaultValue: 1,
-      field: 'allow_comment',
       comment: '1：允许评论；0：不允许评论'
     },
-    isPublic: {
+    is_public: {
       type: DataTypes.TINYINT(2),
       defaultValue: 1,
-      field: 'is_public',
       comment: '1：公开；0：不公开'
-    },
-    createdTime: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-      field: 'created_time',
-      comment: '创建时间'
-    },
-    updatedTime: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-      field: 'updated_time',
-      comment: '更新时间'
-    },
-    deletedTime: {
-      type: DataTypes.DATE,
-      field: 'deleted_time',
-      comment: '删除时间'
     }
-  }, {
+  },
+    {
+      // 定义表的名称
       tableName: 't_news',
-      paranoid: true,     // 删除时不进行物理删除
-      getterMethods: {},  // 获取时添加一些处理后的参数
-      setterMethods: {},  // 存储时进行处理
-      validate: {}        // 一些组合校验 
+      indexes: [
+        {
+          unique: true,
+          fields: ['id']
+        }
+      ],
+      getterMethods: {},
+      // 存储时进行处理
+      setterMethods: {},
+      // 一些组合校验 
+      validate: {}
     })
+
+  News.associate = (models => {
+    // 一对一关联
+    // 使用了foreignKey选项，外键名都会使用此选项值
+    News.belongsTo(models.User, { foreignKey: 'user_id' })
+  })
+
+  return News
 }

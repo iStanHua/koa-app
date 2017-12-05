@@ -19,7 +19,18 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     ssl: config.ssl
   },
   define: {
-    timestamps: false
+    // 不添加时间戳属性 (updatedAt, createdAt)
+    timestamps: true,
+    createdAt: 'created_time',
+    updatedAt: 'updated_time',
+    deletedAt: 'deleted_time',
+    // 不删除数据库条目，但将新添加的属性deletedAt设置为当前日期（删除完成时）。 
+    // paranoid 只有在启用时间戳时才能工作
+    // paranoid: true,
+    // 不使用驼峰样式自动添加属性，而是下划线样式，因此updatedAt将变为updated_at
+    underscored: true,
+    // // 禁用修改表名; 默认情况下，sequelize将自动将所有传递的模型名称（define的第一个参数）转换为复数。 如果你不想这样，请设置以下内容
+    // freezeTableName: true
   }
 })
 
