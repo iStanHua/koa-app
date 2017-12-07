@@ -1,6 +1,6 @@
 //  新闻表
 module.exports = function (sequelize, DataTypes) {
-  const News = sequelize.define('News', {
+  const news = sequelize.define('news', {
     title: {
       type: DataTypes.STRING(100),
       allowNull: false,
@@ -56,11 +56,11 @@ module.exports = function (sequelize, DataTypes) {
       validate: {}
     })
 
-  News.associate = (models => {
+  news.associate = (models => {
     // 一对一关联
     // 使用了foreignKey选项，外键名都会使用此选项值
-    News.belongsTo(models.User, { foreignKey: 'user_id' })
+    news.belongsTo(models.user, { foreignKey: 'user_id' })
   })
 
-  return News
+  return news
 }

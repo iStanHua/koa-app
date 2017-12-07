@@ -7,5 +7,6 @@ router.post('/register', user.register)
 router.post('/login', user.login)
 router.get('/query', user.query)
 router.get('/detail/:id', user.detail)
+router.get('/news/:id', user.news)
 
 module.exports = router

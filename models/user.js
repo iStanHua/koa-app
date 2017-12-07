@@ -1,6 +1,6 @@
 //  用户表
 module.exports = function (sequelize, DataTypes) {
-  const User = sequelize.define('User', {
+  const user = sequelize.define('user', {
     // id: {
     //   type: DataTypes.INTEGER,
     //   autoIncrement: true,
@@ -73,10 +73,10 @@ module.exports = function (sequelize, DataTypes) {
       validate: {}
     })
 
-  User.associate = (models => {
+  user.associate = (models => {
     // 一对多关联
-    User.hasMany(models.News)
+    user.hasMany(models.news)
   })
 
-  return User
+  return user
 }

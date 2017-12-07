@@ -23,7 +23,7 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     timestamps: true,
     createdAt: 'created_time',
     updatedAt: 'updated_time',
-    deletedAt: 'deleted_time',
+    // deletedAt: 'deleted_time',
     // 不删除数据库条目，但将新添加的属性deletedAt设置为当前日期（删除完成时）。 
     // paranoid 只有在启用时间戳时才能工作
     // paranoid: true,
@@ -57,7 +57,6 @@ Object.keys(db).forEach(function (modelName) {
     db[modelName].associate(db)
   }
 })
-
 console.log(db)
 
 //Export the db Object

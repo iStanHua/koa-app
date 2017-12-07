@@ -16,7 +16,10 @@ fs.readdirSync(__dirname).filter((file) => {
 	_loadFiles.push('./seeders/' + file)
 })
 
-sequelize_fixtures.loadFiles(_loadFiles, models).then(function () {
+sequelize_fixtures.loadFiles(_loadFiles, models).then(() => {
 	console.log('Seed data loaded!')
 	process.exit()
-});
+}).catch((err) => {
+	console.log(err)
+	process.exit()
+})

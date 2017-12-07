@@ -1,7 +1,8 @@
 const db = require('../models')
-const User = db.User
+const user = db.user
 
 const md5 = require('../util/md5')
+const validate = require('../util/validate')
 
 const check = {
   /**
@@ -9,14 +10,13 @@ const check = {
    * @param {String} value 密码
    */
   password: (value) => {
-    let charOrNumber = /[A-z]*[a-zA-Z][0-9][A-z0-9][_.@]*/.test(value)
     if (!value) {
       return '密码不可为空'
     }
     if (value.length < 8 || value.length > 20) {
       return '密码长度须在8-20位之间'
     }
-    if (!charOrNumber) {
+    if (!validate.password(value)) {
       return '密码须包含字母、下划线、@和数字'
     }
     return false
@@ -33,11 +33,11 @@ const check = {
       if (value.length < 3 || value.length > 16) {
         resolve('用户名长度在3-16位之间')
       }
-      if (/^[0-9]*$/.test(value)) {
+      if (validate.pureNumber(value)) {
         resolve('用户名不能为纯数字')
       }
       try {
-        let res = await User.findOne({
+        let res = await user.count({
           where: {
             name: value
           }
@@ -58,20 +58,19 @@ const check = {
    */
   phoneNumber: (value) => {
     return new Promise(async (resolve, reject) => {
-      let isNumber = /^1[3|5|6|7|8|9][0,9]{9}$/.test(value)
       if (!value) {
         resolve('手机号码不可为空')
       }
       if (typeof value === 'number') {
         resolve('手机号码格式有误')
       }
-      if (!isNumber) {
+      if (!validate.phoneNumber(value)) {
         resolve('无效的手机号码')
       }
       try {
-        let res = await User.findOne({
+        let res = await user.count({
           where: {
-            phoneNumber: value
+            phone_number: value
           }
         })
         if (res) {
@@ -90,15 +89,14 @@ const check = {
    */
   email: (value) => {
     return new Promise(async (resolve, reject) => {
-      let isEmail = /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/.test(value)
       if (!value) {
         resolve('邮箱不可为空')
       }
-      if (!isEmail) {
+      if (!validate.email(value)) {
         resolve('邮箱格式有误')
       }
       try {
-        let res = await User.findOne({
+        let res = await user.count({
           where: {
             email: value
           }
@@ -153,7 +151,7 @@ exports.register = async (ctx, next) => {
       _body.msg = _msg
       return
     }
-    let result = await User.create(_options)
+    let result = await user.create(_options)
     // _body.data = result
   } catch (e) {
     ctx.status = e.status || 500
@@ -170,37 +168,63 @@ exports.register = async (ctx, next) => {
  * @param {Function} next
  */
 exports.login = async (ctx, next) => {
-  let _body = { code: 200, msg: '登录成功' }
-  const { phone_number, email, password } = ctx.request.body
-  let _msg = ''
-  let _options = {}
-
-  if (phone_number) {
-    _msg = await check.phoneNumber(phone_number)
-    if (!_msg) {
-      _msg = check.password(password)
-    }
-    _options = {
-      phone_number: phone_number,
-      password: password
+  ctx.status = 200
+  let _body = { code: 200, msg: '' }
+  const { userName, password } = ctx.request.body
+  let _options = {
+    where: {
+      password: md5(password),
+      active: 1,
+    },
+    attributes: {
+      exclude: ['password', 'active']
     }
   }
-  else if (email) {
-    _msg = await check.email(email)
-    if (!_msg) {
-      _msg = check.password(password)
+  if (validate.phoneNumber(userName)) {
+    _options.where.phone_number = userName
+
+    let res = await user.count({
+      where: {
+        phone_number: userName,
+        active: 1
+      }
+    })
+    if (!res) {
+      _body.code = 400
+      _body.msg = '该手机号不存在'
     }
-    _options = {
-      email: email,
-      password: password
+  }
+  else if (validate.email(userName)) {
+    _options.where.email = userName
+    let res = await user.count({
+      where: {
+        email: userName,
+        active: 1
+      }
+    })
+    if (!res) {
+      _body.code = 400
+      _body.msg = '该邮箱不存在'
     }
+  }
+  else {
+    _body.code = 400
+    _body.msg = '请输入正确的手机号或邮箱'
   }
   try {
-    let result = await User.findAll(_options)
-    _body.data = result
+    if (!_body.msg) {
+      let count = await user.count(_options)
+      if (count == 0) {
+        _body.code = 401
+        _body.msg = '密码不正确'
+      }
+      else {
+        _body.data = null
+        _body.msg = '登录成功'
+      }
+    }
   } catch (e) {
-    ctx.status = e.status || 500
-    _body.code = e.status || 500
+    _body.code = 500
     _body.msg = e.message
     ctx.app.emit('error', e, ctx)
   } finally {
@@ -213,26 +237,27 @@ exports.login = async (ctx, next) => {
  * @param {Function} next
  */
 exports.query = async (ctx, next) => {
+  ctx.status = 200
   let _body = { code: 200, msg: '查询成功' }
-  let page_index = ctx.request.body.page_index || 1
-  let page_size = ctx.request.body.page_size || 10
+  let { page_index, page_size } = ctx.request.body
+  page_index = page_index || 1
+  page_size = page_size || 10
   let _options = {
     where: {
       active: 1
     },
     attributes: {
-      exclude: ['password', 'active', 'deletedTime']
+      exclude: ['password', 'active']
     },
     offset: (page_index - 1) * page_size,
     limit: page_size,
     order: [['created_time', 'DESC']]
   }
   try {
-    let result = await User.findAndCountAll(_options)
+    let result = await user.findAndCountAll(_options)
     _body.data = result
   }
   catch (e) {
-    ctx.status = e.status || 500
     _body.code = e.status || 500
     _body.msg = e.message
     ctx.app.emit('error', e, ctx)
@@ -248,24 +273,31 @@ exports.query = async (ctx, next) => {
  */
 exports.detail = async (ctx, next) => {
   let { id } = ctx.params
+  ctx.status = 200
   id = Number(id)
   let _body = { code: 200, msg: '查询成功' }
   if (isNaN(id)) {
-    ctx.status = 400
     _body.code = 400
     _body.msg = 'bad request'
     ctx.body = _body
   }
   else {
     try {
-      let result = await User.findById(id)
+      let result = await user.findOne({
+        where: {
+          id: id,
+          active: 1
+        },
+        attributes: {
+          exclude: ['password', 'active']
+        }
+      })
       _body.data = result
       if (!result) {
-        _body.msg = `id=${id} not found`
+        _body.msg = `not found`
       }
     }
     catch (e) {
-      ctx.status = e.status || 500
       _body.code = e.status || 500
       _body.msg = 'internal server error'
       ctx.app.emit('error', e, ctx)
@@ -275,42 +307,52 @@ exports.detail = async (ctx, next) => {
     }
   }
 }
+
 /**
  * 用户新闻列表
  * @param {Object} ctx  上下文
  * @param {Function} next
  */
 exports.news = async (ctx, next) => {
-  let { id } = ctx.params
-  id = Number(id)
+  ctx.status = 200
   let _body = { code: 200, msg: '查询成功' }
+  let { id } = ctx.params
   if (isNaN(id)) {
-    ctx.status = 400
     _body.code = 400
     _body.msg = 'bad request'
     ctx.body = _body
   }
   else {
+
     try {
+      let { page_index, page_size } = ctx.request.body
+      page_index = page_index || 1
+      page_size = page_size || 10
       let _options = {
         where: {
-          id: id
+          is_public: 1
         },
         attributes: {
-          exclude: ['password', 'active', 'deletedTime']
+          exclude: ['is_public', 'user_id']
         },
+        include: [{
+          model: user,
+          where: {
+            id: id
+          },
+          attributes: [],
+        }],
         offset: (page_index - 1) * page_size,
         limit: page_size,
         order: [['created_time', 'DESC']]
       }
-      let result = await User.findAll(_options)
+      let result = await db.news.findAndCountAll(_options)
       _body.data = result
       if (!result) {
-        _body.msg = `id=${id} not found`
+        _body.msg = `not found`
       }
     }
     catch (e) {
-      ctx.status = e.status || 500
       _body.code = e.status || 500
       _body.msg = 'internal server error'
       ctx.app.emit('error', e, ctx)
