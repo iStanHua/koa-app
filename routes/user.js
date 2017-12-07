@@ -5,6 +5,7 @@ router.prefix('/api/user')
 
 router.post('/register', user.register)
 router.post('/login', user.login)
+router.post('/logout', user.logout)
 router.get('/query', user.query)
 router.get('/detail/:id', user.detail)
 router.get('/news/:id', user.news)

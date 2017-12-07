@@ -2,6 +2,7 @@ const db = require('../models')
 const user = db.user
 
 const md5 = require('../util/md5')
+const token = require('../util/token')
 const validate = require('../util/validate')
 
 const check = {
@@ -17,7 +18,7 @@ const check = {
       return '密码长度须在8-20位之间'
     }
     if (!validate.password(value)) {
-      return '密码须包含字母、下划线、@和数字'
+      return '密码须包含字母、数字和特殊字符'
     }
     return false
   },
@@ -119,44 +120,46 @@ const check = {
  * @param {Function} next
  */
 exports.register = async (ctx, next) => {
+  ctx.status = 200
   let _body = { code: 200, msg: '注册成功' }
-  const { phone_number, email, password } = ctx.request.body
+  const { phoneNumber, email, password } = ctx.request.body
   let _msg = ''
   let _options = {}
 
-  if (phone_number) {
-    _msg = await check.phoneNumber(phone_number)
+
+  if (phoneNumber) {
+    _msg = await check.phoneNumber(phoneNumber)
     if (!_msg) {
-      _msg = check.password(password)
     }
     _options = {
-      phoneNumber: phone_number,
-      password: md5(password)
+      phone_number: phoneNumber
     }
   }
   else if (email) {
     _msg = await check.email(email)
-    if (!_msg) {
-      _msg = check.password(password)
-    }
     _options = {
-      email: email,
-      password: md5(password)
+      email: email
+    }
+  }
+  if (!_msg) {
+    _msg = check.password(password)
+    if (!_msg) {
+      _options.password = md5(password)
     }
   }
   try {
     if (_msg) {
-      ctx.status = 400
       _body.code = 400
       _body.msg = _msg
-      return
     }
-    let result = await user.create(_options)
-    // _body.data = result
+    else {
+      console.log(_options)
+      let result = await user.create(_options)
+      // _body.data = result
+    }
   } catch (e) {
-    ctx.status = e.status || 500
     _body.code = e.status || 500
-    _body.msg = e.message
+    _body.msg = 'internal server error'
     ctx.app.emit('error', e, ctx)
   } finally {
     ctx.body = _body
@@ -173,7 +176,6 @@ exports.login = async (ctx, next) => {
   const { userName, password } = ctx.request.body
   let _options = {
     where: {
-      password: md5(password),
       active: 1,
     },
     attributes: {
@@ -183,12 +185,7 @@ exports.login = async (ctx, next) => {
   if (validate.phoneNumber(userName)) {
     _options.where.phone_number = userName
 
-    let res = await user.count({
-      where: {
-        phone_number: userName,
-        active: 1
-      }
-    })
+    let res = await user.count(_options)
     if (!res) {
       _body.code = 400
       _body.msg = '该手机号不存在'
@@ -196,12 +193,7 @@ exports.login = async (ctx, next) => {
   }
   else if (validate.email(userName)) {
     _options.where.email = userName
-    let res = await user.count({
-      where: {
-        email: userName,
-        active: 1
-      }
-    })
+    let res = await user.count(_options)
     if (!res) {
       _body.code = 400
       _body.msg = '该邮箱不存在'
@@ -213,19 +205,43 @@ exports.login = async (ctx, next) => {
   }
   try {
     if (!_body.msg) {
-      let count = await user.count(_options)
-      if (count == 0) {
-        _body.code = 401
+      _options.where.password = md5(password)
+      let _res = await user.findOne(_options)
+      if (!_res) {
+        _body.code = 400
         _body.msg = '密码不正确'
       }
       else {
-        _body.data = null
+        _res.dataValues.token = token.create({
+          username: userName
+        })
+        ctx.session.token = _res.dataValues.token
+        _body.data = _res
         _body.msg = '登录成功'
       }
     }
   } catch (e) {
     _body.code = 500
-    _body.msg = e.message
+    _body.msg = 'internal server error'
+    ctx.app.emit('error', e, ctx)
+  } finally {
+    ctx.body = _body
+  }
+}
+/**
+ * 用户退出
+ * @param {Object} ctx  上下文
+ * @param {Function} next
+ */
+exports.logout = async (ctx, next) => {
+  ctx.status = 200
+  let _body = { code: 200, msg: '' }
+  try {
+    ctx.session = null
+    _body.msg = '退出成功'
+  } catch (e) {
+    _body.code = 500
+    _body.msg = 'internal server error'
     ctx.app.emit('error', e, ctx)
   } finally {
     ctx.body = _body
