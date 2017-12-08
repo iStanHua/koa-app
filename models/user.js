@@ -48,7 +48,7 @@ module.exports = function (sequelize, DataTypes) {
       // field: 'phone_number',
       comment: '手机号',
       validate: {
-        is: /^1[3|5|6|7|8|9][0-9]{9}$/
+        is: /^1[3|5|6|7|8|9]\d{9}$/
       }
     },
     active: {

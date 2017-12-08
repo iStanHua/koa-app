@@ -1,5 +1,6 @@
 const key = 'koa'
 const crypto = require('crypto')
+
 module.exports = (password, salt) => {
     let _pass = password
     let decipher = crypto.createHash('md5')

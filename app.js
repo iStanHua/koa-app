@@ -1,7 +1,7 @@
 const Koa = require('koa')
 const views = require('koa-views')
 const json = require('koa-json')
-const session = require('koa-session')
+const session = require('koa-session2')
 const onerror = require('koa-onerror')
 // 传参获取
 const bodyparser = require('koa-bodyparser')
@@ -12,6 +12,8 @@ const cors = require('koa-cors')
 const mount = require('koa-mount')
 
 const routes = require('./routes')
+const token = require('./util/token')
+const exportFormat = require('./util/exportFormat')
 
 const app = new Koa()
 
@@ -25,21 +27,10 @@ app.use(bodyparser({
 app.use(json())
 app.use(logger())
 app.use(cors())
-
-app.keys = ['koa', 'mysql', 'stanhua'];
-const CONFIG = {
-  key: 'USER:SESS', /** (string) cookie key (default is koa:sess) */
-  /** (number || 'session') maxAge in ms (default is 1 days) */
-  /** 'session' will result in a cookie that expires when session/browser is closed */
-  /** Warning: If a session cookie is stolen, this cookie will never expire */
-  maxAge: 86400000,
-  overwrite: true, /** (boolean) can overwrite or not (default true) */
-  httpOnly: true, /** (boolean) httpOnly or not (default true) */
-  signed: true, /** (boolean) signed or not (default true) */
-  rolling: false, /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. default is false **/
-}
-
-app.use(session(CONFIG, app))
+app.use(session({
+  key: 'SESSION_KOA_ID',
+  maxAge: 60 * 60 * 1000 // (60分钟有效期)
+}))
 
 app.use(require('koa-static')(__dirname + '/public'))
 app.use(views(__dirname + '/views', {
@@ -50,6 +41,14 @@ app.use(views(__dirname + '/views', {
 app.use(async (ctx, next) => {
   try {
     const start = new Date()
+    // if (!ctx.header.authorization) {
+    //   exportFormat.error(ctx, 400, '请登录')
+    // } else {
+    //   let isToken = await token.verify(ctx.header.authorization)
+    //   ctx.request.userId = isToken.id
+    //   ctx.request.userName = isToken.name
+    // }
+    console.log(ctx.header.authorization)
     await next()
     const ms = new Date() - start
     console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
@@ -57,7 +56,7 @@ app.use(async (ctx, next) => {
     if (err.status === 401) {
       ctx.status = 401
       ctx.set('WWW-Authenticate', 'Basic')
-      ctx.body = 'cant haz that'
+      ctx.body = 'authenticate'
     } else {
       throw err
     }
@@ -65,7 +64,7 @@ app.use(async (ctx, next) => {
 })
 
 // router
-routes(app)
+app.use(routes.routes(), routes.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {

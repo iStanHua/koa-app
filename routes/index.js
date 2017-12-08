@@ -4,7 +4,9 @@ const router = require('koa-router')()
 const user = require('./user')
 const news = require('./news')
 
-module.exports = app => {
-    app.use(user.routes(), user.allowedMethods())
-    app.use(news.routes(), news.allowedMethods())
-}
+router.prefix('/api')
+
+router.use(user.routes(), user.allowedMethods())
+router.use(news.routes(), news.allowedMethods())
+
+module.exports = router
