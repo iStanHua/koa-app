@@ -178,9 +178,11 @@ exports.login = async (data) => {
             result = { code: 400, msg: '密码不正确' }
         }
         else {
-            let _token = token.create(result)
+            let _token = token.create({
+                id: result.dataValues.id,
+                name: result.dataValues.name
+            })
             result.dataValues.token = _token
-            ctx.session.token = _token
         }
     }
     return result

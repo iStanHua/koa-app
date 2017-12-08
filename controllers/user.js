@@ -53,6 +53,10 @@ exports.login = async (ctx, next) => {
     if (result.code) {
       _body = result
     }
+    else {
+      ctx.session.token = result.dataValues.token
+      _body.data = result
+    }
   }
   catch (e) {
     _body = error.SERVER_EORROR
