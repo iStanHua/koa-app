@@ -14,6 +14,7 @@ const mount = require('koa-mount')
 const routes = require('./routes')
 const token = require('./util/token')
 const exportFormat = require('./util/exportFormat')
+const sendMail = require('./util/sendMail')
 
 const app = new Koa()
 
@@ -48,7 +49,14 @@ app.use(async (ctx, next) => {
     //   ctx.request.userId = isToken.id
     //   ctx.request.userName = isToken.name
     // }
-    console.log(ctx.header.authorization)
+    // const ms = new Date() - start
+    // sendMail({
+    //   from: 'stanhua@aliyun.com',
+    //   to: '1254493153@qq.com',
+    //   subject: 'Hello ✔',
+    //   text: `${ctx.method} ${ctx.url} - ${ms}ms`,
+    //   html: `<div class='desc'>${ctx.method} ${ctx.url} - ${ms} ms</div>`
+    // })
     await next()
     const ms = new Date() - start
     console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
