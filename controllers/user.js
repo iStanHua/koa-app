@@ -159,7 +159,7 @@ exports.updatePassword = async (ctx, next) => {
  */
 exports.query = async (ctx, next) => {
   let _body = { code: 200, msg: '' }
-  let { page_index, page_size } = ctx.request.body
+  let { page_index, page_size } = ctx.query
   try {
     let result = await user.findAndCountAll(page_index, page_size)
     _body.data = result

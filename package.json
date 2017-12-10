@@ -19,7 +19,8 @@
     "koa-session": "^5.5.1",
     "koa-static": "^4.0.2",
     "koa-views": "^6.1.2",
-    "pug": "^2.0.0-rc.4"
+    "pug": "^2.0.0-rc.4",
+    "axios": "^0.16.2"
   },
   "devDependencies": {
     "cheerio": "^1.0.0-rc.2",

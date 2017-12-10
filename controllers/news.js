@@ -8,7 +8,7 @@ const news = db.news
  */
 exports.query = async (ctx, next) => {
   let _body = { code: 200, msg: '查询成功' }
-  let { page_index, page_size } = ctx.request.body
+  let { page_index, page_size } = ctx.query
   page_index = page_index || 1
   page_size = page_size || 10
   let _options = {
