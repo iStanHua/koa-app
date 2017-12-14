@@ -1,6 +1,51 @@
-const db = require('../models')
-const news = db.news
-
+const news = require('../services/news')
+const exportFormat = require('../util/exportFormat')
+const error = require('../error')
+/**
+ * 新增新闻
+ * @param {Object} ctx  上下文
+ * @param {Function} next
+ */
+exports.add = async (ctx, next) => {
+  let _body = { code: 200, msg: '新增成功' }
+  try {
+    let result = await news.add({})
+    if (result.code) {
+      _body = result
+    }
+  }
+  catch (e) {
+    _body = error.SERVER_EORROR
+    ctx.app.emit('error', e, ctx)
+  }
+  finally {
+    exportFormat.success(ctx, _body)
+  }
+}
+/**
+* 批量新增新闻
+ * @param {Object} ctx  上下文
+ * @param {Function} next
+*/
+exports.batchAdd = async (ctx, next) => {
+  let _body = { code: 200, msg: '批量新增成功' }
+  try {
+    let result = await news.batchAdd()
+    if (result.code) {
+      _body = result
+    }
+    else {
+      _body.data = result
+    }
+  }
+  catch (e) {
+    _body = error.SERVER_EORROR
+    ctx.app.emit('error', e, ctx)
+  }
+  finally {
+    exportFormat.success(ctx, _body)
+  }
+}
 /**
  * 查询新闻
  * @param {Object} ctx  上下文
@@ -8,36 +53,17 @@ const news = db.news
  */
 exports.query = async (ctx, next) => {
   let _body = { code: 200, msg: '查询成功' }
-  let { page_index, page_size } = ctx.query
-  page_index = page_index || 1
-  page_size = page_size || 10
-  let _options = {
-    where: {
-      is_public: 1
-    },
-    attributes: {
-      exclude: ['is_public', 'user_id']
-    },
-    include: [{
-      model: db.user,
-      attributes: ['id', 'name', 'avatar']
-    }],
-    offset: (page_index - 1) * page_size,
-    limit: page_size,
-    order: [['created_time', 'DESC']]
-  }
   try {
-    let result = await news.findAndCountAll(_options)
+    let { page_index, page_size } = ctx.query
+    let result = await news.findAndCountAll(page_index, page_size)
     _body.data = result
   }
   catch (e) {
-    ctx.status = e.status || 500
-    _body.code = e.status || 500
-    _body.msg = 'internal server error'
+    _body = error.SERVER_EORROR
     ctx.app.emit('error', e, ctx)
   }
   finally {
-    ctx.body = _body
+    exportFormat.success(ctx, _body)
   }
 }
 /**
@@ -50,90 +76,22 @@ exports.detail = async (ctx, next) => {
   id = Number(id)
   let _body = { code: 200, msg: '查询成功' }
   if (isNaN(id)) {
-    ctx.status = 400
-    _body.code = 400
-    _body.msg = 'bad request'
-    ctx.body = _body
-  }
-  else {
-    try {
-      let result = await news.findOne({
-        where: {
-          id: id
-        },
-        attributes: {
-          exclude: ['is_public', 'user_id']
-        },
-        include: [{
-          model: db.user,
-          attributes: ['id', 'name', 'avatar']
-        }],
-      })
-      _body.data = result
-      if (!result) {
-        _body.msg = `not found`
-      }
-    }
-    catch (e) {
-      ctx.status = e.status || 500
-      _body.code = e.status || 500
-      _body.msg = 'internal server error'
-      ctx.app.emit('error', e, ctx)
-    }
-    finally {
-      ctx.body = _body
-    }
-  }
-}
-
-/**
- * 用户新闻列表
- * @param {Object} ctx  上下文
- * @param {Function} next
- */
-exports.news = async (ctx, next) => {
-  let _body = { code: 200, msg: '' }
-  let { id } = ctx.params
-  if (isNaN(id)) {
     _body = error.INVALID_FIELD
   }
   else {
-
     try {
-      let { page_index, page_size } = ctx.request.body
-      page_index = page_index || 1
-      page_size = page_size || 10
-      let _options = {
-        where: {
-          is_public: 1
-        },
-        attributes: {
-          exclude: ['is_public', 'user_id']
-        },
-        include: [{
-          model: user,
-          where: {
-            id: id
-          },
-          attributes: [],
-        }],
-        offset: (page_index - 1) * page_size,
-        limit: page_size,
-        order: [['created_time', 'DESC']]
-      }
-      let result = await db.news.findAndCountAll(_options)
+      let result = await news.findById(id)
       _body.data = result
       if (!result) {
-        _body.msg = `not found`
+        _body = error.NO_DATA
       }
     }
     catch (e) {
-      _body.code = e.status || 500
-      _body.msg = 'internal server error'
+      _body = error.SERVER_EORROR
       ctx.app.emit('error', e, ctx)
     }
     finally {
-      ctx.body = _body
+      exportFormat.success(ctx, _body)
     }
   }
 }

@@ -1,10 +1,9 @@
-const service = require('./index')
+const service = require('./index')('user')
 const error = require('../error')
 const validate = require('../util/validate')
 const md5 = require('../util/md5')
 const token = require('../util/token')
 
-const mod = 'user'
 const checkField = {
     /**
      * 检查密码
@@ -38,7 +37,7 @@ const checkField = {
                 resolve('用户名不能为纯数字')
             }
             try {
-                let res = await service.count(mod, { where: { name: value } })
+                let res = await service.count({ where: { name: value } })
                 if (res) {
                     resolve('该用户名已被注册')
                 } else {
@@ -65,7 +64,7 @@ const checkField = {
                 resolve('无效的手机号码')
             }
             try {
-                let res = await service.count(mod, { where: { phone_number: value } })
+                let res = await service.count({ where: { phone_number: value } })
                 if (res) {
                     resolve('该手机号已被注册')
                 } else {
@@ -89,7 +88,7 @@ const checkField = {
                 resolve('邮箱格式有误')
             }
             try {
-                let res = await service.count(mod, { where: { email: value } })
+                let res = await service.count({ where: { email: value } })
                 if (res) {
                     resolve('该邮箱已被注册')
                 } else {
@@ -132,7 +131,7 @@ exports.add = async (data) => {
         result.code = 400
     }
     else {
-        result = await service.add(mod, data)
+        result = await service.add(data)
     }
     return result
 }
@@ -152,14 +151,15 @@ exports.login = async (data) => {
     }
     if (data.phone_number) {
         _options.where.phone_number = data.phone_number
-        let res = await service.count(mod, _options)
+        let res = await service.count(_options)
         if (!res) {
             result.msg = '该手机号不存在'
         }
     }
     else if (data.email) {
         _options.where.email = data.email
-        let res = await service.count(mod, _options)
+        console.log(service)
+        let res = await service.count(_options)
         if (!res) {
             result.msg = '该邮箱不存在'
         }
@@ -172,8 +172,7 @@ exports.login = async (data) => {
         result.code = 400
     }
     else {
-        console.log(_options)
-        result = await service.findOne(mod, _options)
+        result = await service.findOne(_options)
         if (!result) {
             result = { code: 400, msg: '密码不正确' }
         }
@@ -196,12 +195,12 @@ exports.login = async (data) => {
  */
 exports.delete = async (id, flag = false) => {
     let options = { where: { id: id } }
-    let count = await service.count(mod, options)
+    let count = await service.count(options)
     if (!count) {
         return { code: 400, msg: '用户不存在' }
     }
     if (flag) {
-        let result = await service.delete(mod, options)
+        let result = await service.delete(options)
         return result
     }
     else {
@@ -217,11 +216,11 @@ exports.delete = async (id, flag = false) => {
  */
 exports.update = async (id, data) => {
     let options = { where: { id: id } }
-    let count = await service.count(mod, options)
+    let count = await service.count(options)
     if (!count) {
         return { code: 400, msg: '用户不存在' }
     }
-    let result = await service.update(mod, data, options)
+    let result = await service.update(data, options)
     return result
 }
 
@@ -231,7 +230,7 @@ exports.update = async (id, data) => {
  * @returns result 
  */
 exports.findById = async (id) => {
-    let result = await service.findOne(mod, {
+    let result = await service.findOne({
         where: {
             id: id,
             active: 1
@@ -262,6 +261,6 @@ exports.findAndCountAll = async (page_index, page_size) => {
         limit: page_size,
         order: [['created_time', 'DESC']]
     }
-    let result = await service.findAndCountAll(mod, _options)
+    let result = await service.findAndCountAll(_options)
     return result
 }

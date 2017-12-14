@@ -2,35 +2,6 @@ const user = require('../services/user')
 const exportFormat = require('../util/exportFormat')
 const error = require('../error')
 
-const userMod = 'user'
-
-/**
- * 用户注册
- * @param {Object} ctx  上下文
- * @param {Function} next
- */
-exports.register = async (ctx, next) => {
-  let _body = { code: 200, msg: '注册成功' }
-  try {
-    const { phoneNumber, email, password } = ctx.request.body
-    let _data = {}
-    if (phoneNumber) {
-      _data.phone_number = phoneNumber
-    }
-    else if (email) {
-      _data.email = email
-    }
-    _data.password = password
-    let result = await user.add(_data)
-  }
-  catch (e) {
-    _body = error.SERVER_EORROR
-    ctx.app.emit('error', e, ctx)
-  }
-  finally {
-    exportFormat.success(ctx, _body)
-  }
-}
 /**
  * 用户登录
  * @param {Object} ctx  上下文
@@ -66,6 +37,7 @@ exports.login = async (ctx, next) => {
     exportFormat.success(ctx, _body)
   }
 }
+
 /**
  * 用户退出
  * @param {Object} ctx  上下文
@@ -73,10 +45,9 @@ exports.login = async (ctx, next) => {
  */
 exports.logout = async (ctx, next) => {
   ctx.status = 200
-  let _body = { code: 200, msg: '' }
+  let _body = { code: 200, msg: '退出成功' }
   try {
     ctx.session = {}
-    _body.msg = '退出成功'
   } catch (e) {
     _body.code = 500
     _body.msg = 'internal server error'
@@ -85,34 +56,35 @@ exports.logout = async (ctx, next) => {
     ctx.body = _body
   }
 }
+
 /**
- * 删除用户
+ * 用户注册
  * @param {Object} ctx  上下文
  * @param {Function} next
  */
-exports.delete = async (ctx, next) => {
-  let _body = { code: 200, msg: '' }
-  let { id } = ctx.params
-  id = Number(id)
-  if (isNaN(id)) {
-    _body = error.INVALID_FIELD
+exports.register = async (ctx, next) => {
+  let _body = { code: 200, msg: '注册成功' }
+  try {
+    const { phoneNumber, email, password } = ctx.request.body
+    let _data = {}
+    if (phoneNumber) {
+      _data.phone_number = phoneNumber
+    }
+    else if (email) {
+      _data.email = email
+    }
+    _data.password = password
+    let result = await user.add(_data)
   }
-  else {
-    try {
-      let result = await user.delete(id)
-      if (result.code) {
-        _body = result
-      }
-    }
-    catch (e) {
-      _body = error.SERVER_EORROR
-      ctx.app.emit('error', e, ctx)
-    }
-    finally {
-      exportFormat.success(ctx, _body)
-    }
+  catch (e) {
+    _body = error.SERVER_EORROR
+    ctx.app.emit('error', e, ctx)
+  }
+  finally {
+    exportFormat.success(ctx, _body)
   }
 }
+
 /**
  * 修改密码
  * @param {Object} ctx  上下文
@@ -142,7 +114,6 @@ exports.updatePassword = async (ctx, next) => {
       _body.code = 400
     }
     else {
-      console.log(_options)
       let result = await user.add(_options)
     }
   } catch (e) {
@@ -150,6 +121,35 @@ exports.updatePassword = async (ctx, next) => {
     ctx.app.emit('error', e, ctx)
   } finally {
     exportFormat.success(ctx, _body)
+  }
+}
+
+/**
+ * 删除用户
+ * @param {Object} ctx  上下文
+ * @param {Function} next
+ */
+exports.delete = async (ctx, next) => {
+  let _body = { code: 200, msg: '' }
+  let { id } = ctx.params
+  id = Number(id)
+  if (isNaN(id)) {
+    _body = error.INVALID_FIELD
+  }
+  else {
+    try {
+      let result = await user.delete(id)
+      if (result.code) {
+        _body = result
+      }
+    }
+    catch (e) {
+      _body = error.SERVER_EORROR
+      ctx.app.emit('error', e, ctx)
+    }
+    finally {
+      exportFormat.success(ctx, _body)
+    }
   }
 }
 /**

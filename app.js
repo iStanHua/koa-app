@@ -16,6 +16,8 @@ const token = require('./util/token')
 const exportFormat = require('./util/exportFormat')
 const sendMail = require('./util/sendMail')
 
+let schedules = require('./schedules')
+
 const app = new Koa()
 
 // error handler
@@ -40,35 +42,11 @@ app.use(views(__dirname + '/views', {
 
 // logger
 app.use(async (ctx, next) => {
-  try {
     const start = new Date()
-    // if (!ctx.header.authorization) {
-    //   exportFormat.error(ctx, 400, '请登录')
-    // } else {
-    //   let isToken = await token.verify(ctx.header.authorization)
-    //   ctx.request.userId = isToken.id
-    //   ctx.request.userName = isToken.name
-    // }
-    // const ms = new Date() - start
-    // sendMail({
-    //   from: 'stanhua@aliyun.com',
-    //   to: '1254493153@qq.com',
-    //   subject: 'Hello ✔',
-    //   text: `${ctx.method} ${ctx.url} - ${ms}ms`,
-    //   html: `<div class='desc'>${ctx.method} ${ctx.url} - ${ms} ms</div>`
-    // })
     await next()
     const ms = new Date() - start
     console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
-  } catch (err) {
-    if (err.status === 401) {
-      ctx.status = 401
-      ctx.set('WWW-Authenticate', 'Basic')
-      ctx.body = 'authenticate'
-    } else {
-      throw err
-    }
-  }
+    console.log(new Date())
 })
 
 // router
@@ -77,6 +55,8 @@ app.use(routes.routes(), routes.allowedMethods())
 // error-handling
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
-});
+})
+
+schedules.start()
 
 module.exports = app

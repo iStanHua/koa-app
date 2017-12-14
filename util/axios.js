@@ -44,7 +44,6 @@ exports.http = (url, type = 'get', data) => {
         axios(_options)
             .then(res => {
                 let _data = res.data
-                // 请求接口成功
                 if (res.status == 200) {
                     resolve(_data)
                 }
