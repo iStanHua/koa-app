@@ -1,0 +1,214 @@
+[
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appid}&secret=${secret}"
+    },
+    {
+        "type": "POST",
+        "url": "http://file.api.weixin.qq.com/cgi-bin/media/upload?access_token=${access_token}&type=image,voice,video,thumb&media=${media}"
+    },
+    {
+        "type": "GET",
+        "url": "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=${access_token}&media_id=${media_id}"
+    },
+    {
+        "type": "POST",
+        "url": "http://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=${access_token}&type=image&buffer=${buffer}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/cgi-bin/user/get?access_token=${access_token}&next_openid=${next_openid}"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/cgi-bin/user/info?access_token=${access_token}&openid=${openid}"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/cgi-bin/groups/get?access_token=${access_token}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/groups/create?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/groups/update?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/groups/members/update?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/groups/getid?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=${access_token}"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=${access_token}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "GET",
+        "url": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${ticket}"
+    },
+    {
+        "type": "POST",
+        "url": "文本消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=text&Content=${Content}&MsgId=${MsgId}"
+    },
+    {
+        "type": "POST",
+        "url": "图片消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=image&PicUrl=${PicUrl}&MsgId=${MsgId}"
+    },
+    {
+        "type": "POST",
+        "url": "语音消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=voice&MediaId=${MediaId}&Format=${Format}&MsgId=${MsgId}"
+    },
+    {
+        "type": "POST",
+        "url": "视频消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=video&MediaId=${MediaId}&ThumbMediaId=${ThumbMediaId}&MsgId=${MsgId}"
+    },
+    {
+        "type": "POST",
+        "url": "地理位置消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=location&Location_X=${Location_X}&Location_Y=${Location_Y}&Scale=${Scale}&Label=${Label}&MsgId=${MsgId}"
+    },
+    {
+        "type": "POST",
+        "url": "链接消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=link&Title=${Title}&Description=${Description}&Url=${Url}&MsgId=${MsgId}"
+    },
+    {
+        "type": "POST",
+        "url": "事件消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=event&Event=${Event}&Latitude=${Latitude}&Longitude=${Longitude}&Precision=${Precision}&MsgId=${MsgId}"
+    },
+    {
+        "type": "POST",
+        "url": "小程序widget事件消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=event&Event=wxa_widget_data&Query=${Query}&Scene=1"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/device/getqrcode?access_token=${access_token}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/device/authorize_device?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/device/verify_qrcode?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/device/get_stat?access_token=${access_token}&device_id=${device_id}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/device/bind?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/device/compel_bind?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/device/unbind?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/device/compel_unbind?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/device/get_openid?access_token=${access_token}&device_type=${device_type}&device_id=${device_id}"
+    },
+    {
+        "type": "GET",
+        "url": "https://api.weixin.qq.com/device/get_bind_device?access_token=${access_token}&openid=${openid}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/device/transmsg?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/device/transmsg?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "设备向后台发送数据?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=device_text&DeviceType=${DeviceType}&DeviceID=${DeviceID}&Content=${Content}&SessionID=${SessionID}&MsgId=${MsgId}&OpenID=${OpenID}"
+    },
+    {
+        "type": "POST",
+        "url": "绑定/解绑消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=device_event&Event=${Event}&DeviceType=${DeviceType}&DeviceID=${DeviceID}&Content=${Content}&SessionID=${SessionID}&OpenID=${OpenID}"
+    },
+    {
+        "type": "POST",
+        "url": "请求绑定消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=device_event&Event=${Event}&DeviceType=${DeviceType}&DeviceID=${DeviceID}&Content=${Content}&SessionID=${SessionID}&OpenID=${OpenID}"
+    },
+    {
+        "type": "POST",
+        "url": "wifi设备连接状态订阅/退订消息?URL=${URL}&ToUserName=${ToUserName}&FromUserName=${FromUserName}&CreateTime=${CreateTime}&MsgType=device_event&Event=${Event}&DeviceType=${DeviceType}&DeviceID=${DeviceID}&OpType=${OpType}&OpenID=${OpenID}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/card/create?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/card/qrcode/create?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/card/testwhitelist/set?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/card/code/consume?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/comment/open?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/comment/close?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/comment/list?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/comment/markelect?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/comment/unmarkelect?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/comment/delete?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/comment/reply/add?access_token=${access_token}&body=${body}"
+    },
+    {
+        "type": "POST",
+        "url": "https://api.weixin.qq.com/cgi-bin/comment/reply/delete?access_token=${access_token}&body=${body}"
+    }
+]
