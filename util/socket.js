@@ -1,23 +1,28 @@
-module.exports = (socket) => {
-    let isLogin = false
-    let users = []
-    let numUsers = 0
-    // when the client emits 'add user', this listens and executes
-    socket.on('add:user', function (username) {
-        if (isLogin) return
 
-        // we store the username in the socket session for this client
-        socket.username = username
-        users.push(username)
-        ++numUsers
-        isLogin = true
+//在线用户
+var onlineUsers = {}
+//当前在线人数
+var onlineCount = 0
+
+module.exports = (socket) => {
+    socket.on('add:user', (obj) => {
+        //将新加入用户的唯一标识当作socket的名称，后面退出的时候会用到
+        socket.name = obj.id
+
+        //检查在线列表，如果不在里面就加入
+        if (!onlineUsers.hasOwnProperty(obj.id)) {
+            onlineUsers[obj.id] = obj.name
+            //在线人数+1
+            ++onlineCount
+        }
         socket.emit('login', {
-            numUsers: numUsers
+            onlineCount: onlineCount,
+            onlineUsers: onlineUsers,
+            user: obj
         });
-        // echo globally (all clients) that a person has connected
+        //向所有客户端广播用户加入
         socket.broadcast.emit('user:joined', {
-            username: users.username,
-            numUsers: users.numUsers
+            username: obj.name
         });
     });
 
@@ -25,7 +30,7 @@ module.exports = (socket) => {
     socket.on('send:message', function (data) {
         // we tell the client to execute 'send:message'
         socket.broadcast.emit('send:message', {
-            username: socket.username,
+            name: socket.name,
             message: data
         })
     })
@@ -33,28 +38,26 @@ module.exports = (socket) => {
     // when the client emits 'typing', we broadcast it to others
     socket.on('typing', function () {
         socket.broadcast.emit('typing', {
-            username: socket.username
+            name: socket.name
         });
     });
 
     // when the client emits 'stop:typing', we broadcast it to others
     socket.on('stop:typing', function () {
         socket.broadcast.emit('stop:typing', {
-            username: socket.username
+            name: socket.name
         });
     });
 
     // when the user disconnects.. perform this
     socket.on('disconnect', function () {
-        if (isLogin) {
-            users.splice((numUsers - 1), 0)
-            --numUsers
-            // echo globally that this client has left
-            socket.broadcast.emit('user:logout', {
-                username: socket.username,
-                numUsers: numUsers
-            })
-            console.log(users)
-        }
+        //删除
+        delete onlineUsers[socket.name]
+
+        --onlineCount
+        // echo globally that this client has left
+        socket.broadcast.emit('user:logout', {
+            name: socket.name
+        })
     })
 }
