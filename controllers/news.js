@@ -27,10 +27,34 @@ exports.add = async (ctx, next) => {
  * @param {Object} ctx  上下文
  * @param {Function} next
 */
-exports.batchAdd = async (ctx, next) => {
+exports.batchAddNews = async (ctx, next) => {
   let _body = { code: 200, msg: '批量新增成功' }
   try {
-    let result = await news.batchAdd()
+    let result = await news.batchAddNews()
+    if (result.code) {
+      _body = result
+    }
+    else {
+      _body.data = result
+    }
+  }
+  catch (e) {
+    _body = error.SERVER_EORROR
+    ctx.app.emit('error', e, ctx)
+  }
+  finally {
+    exportFormat.success(ctx, _body)
+  }
+}
+/**
+* 批量新增新闻
+ * @param {Object} ctx  上下文
+ * @param {Function} next
+*/
+exports.batchAddData = async (ctx, next) => {
+  let _body = { code: 200, msg: '批量新增成功' }
+  try {
+    let result = await news.batchAddData()
     if (result.code) {
       _body = result
     }

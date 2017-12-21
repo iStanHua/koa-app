@@ -9,10 +9,12 @@ let schedule = {}
 
 schedule.start = () => {
 	//开始任务的时候先更新一次
-	news.batchAdd()
+	news.batchAddNews()
+	news.batchAddData()
 	//注册定时任务
 	schedule.job = nodeSchedule.scheduleJob(rule, () => {
-		news.batchAdd()
+		news.batchAddNews()
+		news.batchAddData()
 	});
 }
 

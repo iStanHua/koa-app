@@ -19,8 +19,50 @@ exports.add = async (data) => {
  * @param {Object} data 新闻数据
  * @returns result
  */
-exports.batchAdd = async () => {
+exports.batchAddNews = async () => {
     let list = await yicai.news()
+    list.forEach(async ele => {
+        let detail = await yicai.newsDetail(ele.id)
+        let _channel = await channel.findOrCreate({
+            where: { name: ele.channel.name },
+            defaults: {
+                name: ele.channel.name,
+                name_en: ele.channel.en
+            }
+        })
+        let _source = await source.findOrCreate({
+            where: { name: detail.source },
+            defaults: {
+                name: detail.source
+            }
+        })
+        let data = {}
+        data.news_id = ele.id
+        data.title = ele.title
+        data.title = ele.title
+        data.abstract = ele.abstract
+        data.content = detail.content
+        data.image = ele.image
+        data.channel_id = _channel[0].dataValues.id
+        data.source_id = _source[0].dataValues.id
+        data.editor = detail.editor
+        data.user_id = 1
+        data.created_time = ele.create_time
+        data.updated_time = ele.create_time
+        await news.findOrCreate({
+            where: { news_id: ele.id },
+            defaults: data
+        })
+    })
+    return list
+}
+/**
+ * 批量新增新闻
+ * @param {Object} data 新闻数据
+ * @returns result
+ */
+exports.batchAddData = async () => {
+    let list = await yicai.data()
     list.forEach(async ele => {
         let detail = await yicai.newsDetail(ele.id)
         let _channel = await channel.findOrCreate({

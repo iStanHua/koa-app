@@ -4,6 +4,7 @@ const router = require('koa-router')()
 const user = require('./user')
 const news = require('./news')
 const yicai = require('./yicai')
+const weather = require('./weather')
 const wx = require('./wx')
 
 router.prefix('/api')
@@ -11,6 +12,7 @@ router.prefix('/api')
 router.use(user.routes(), user.allowedMethods())
 router.use(news.routes(), news.allowedMethods())
 router.use(yicai.routes(), yicai.allowedMethods())
+router.use(weather.routes(), weather.allowedMethods())
 router.use(wx.routes(), wx.allowedMethods())
 
 module.exports = router
