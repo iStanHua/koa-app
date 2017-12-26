@@ -26,7 +26,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     avatar: {
       type: DataTypes.STRING,
-      defaultValue: 'http://res.cloudinary.com/hezf/image/upload/v1467186691/vwuj8a3tpuqoy5fzuzlw.png',
+      defaultValue: 'https://ss0.bdstatic.com/7Ls0a8Sm1A5BphGlnYG/sys/portrait/item/db0ce68abde8b1a1619910',
       comment: '头像'
     },
     password: {

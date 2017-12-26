@@ -8,6 +8,21 @@ const env = process.env.NODE_ENV || 'development'
 const config = require('../config/mysql')[env]
 const db = {}
 
+async function createDb() {
+  // get the client
+  const mysql = require('mysql2/promise');
+  // create the connection
+  var connection = await mysql.createConnection({
+    host: config.host,
+    user: config.username,
+    password: config.password
+  })
+  // create database
+  const DATABASE = await connection.execute('CREATE DATABASE IF NOT EXISTS ' + config.database)
+}
+
+createDb()
+
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   host: config.host,
   dialect: config.dialect,
