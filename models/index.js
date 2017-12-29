@@ -72,7 +72,6 @@ Object.keys(db).forEach(function (modelName) {
     db[modelName].associate(db)
   }
 })
-console.log(db)
 
 //Export the db Object
 db.sequelize = sequelize

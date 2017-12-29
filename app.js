@@ -16,8 +16,6 @@ const token = require('./util/token')
 const exportFormat = require('./util/exportFormat')
 const sendMail = require('./util/sendMail')
 
-let schedules = require('./schedules')
-
 const app = new Koa()
 
 // error handler
@@ -56,7 +54,5 @@ app.use(routes.routes(), routes.allowedMethods())
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
 })
-
-schedules.start()
 
 module.exports = app

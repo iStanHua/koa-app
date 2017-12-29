@@ -18,4 +18,4 @@ schedule.start = () => {
 	});
 }
 
-module.exports = schedule
+schedule.start()

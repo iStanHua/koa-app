@@ -6,7 +6,8 @@
     "start": "node bin/www",
     "dev": "./node_modules/.bin/nodemon bin/www",
     "db-init": "node util/dbInit.js",
-    "pm2": "pm2 start bin/www"
+    "pm2": "pm2 start bin/www",
+    "task": "node schedules/index.js"
   },
   "dependencies": {
     "debug": "^2.6.3",
