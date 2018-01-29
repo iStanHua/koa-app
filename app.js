@@ -40,11 +40,11 @@ app.use(views(__dirname + '/views', {
 
 // logger
 app.use(async (ctx, next) => {
-    const start = new Date()
-    await next()
-    const ms = new Date() - start
-    console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
-    console.log(new Date())
+  const start = new Date()
+  await next()
+  const ms = new Date() - start
+  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+  console.log(new Date())
 })
 
 // router
@@ -54,5 +54,6 @@ app.use(routes.routes(), routes.allowedMethods())
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
 })
+
 
 module.exports = app

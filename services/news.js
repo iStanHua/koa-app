@@ -169,8 +169,8 @@ exports.findById = async (id) => {
  * @returns result
  */
 exports.findAndCountAll = async (page_index, page_size) => {
-    page_index = page_index || 1
-    page_size = page_size || 10
+    page_index = Number(page_index) || 1
+    page_size = Number(page_size) || 10
     let _options = {
         where: {
             is_public: 1
