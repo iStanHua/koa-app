@@ -23,54 +23,6 @@ exports.add = async (ctx, next) => {
   }
 }
 /**
-* 批量新增新闻
- * @param {Object} ctx  上下文
- * @param {Function} next
-*/
-exports.batchAddNews = async (ctx, next) => {
-  let _body = { code: 200, msg: '批量新增成功' }
-  try {
-    let result = await news.batchAddNews()
-    if (result.code) {
-      _body = result
-    }
-    else {
-      _body.data = result
-    }
-  }
-  catch (e) {
-    _body = error.SERVER_EORROR
-    ctx.app.emit('error', e, ctx)
-  }
-  finally {
-    exportFormat.success(ctx, _body)
-  }
-}
-/**
-* 批量新增新闻
- * @param {Object} ctx  上下文
- * @param {Function} next
-*/
-exports.batchAddData = async (ctx, next) => {
-  let _body = { code: 200, msg: '批量新增成功' }
-  try {
-    let result = await news.batchAddData()
-    if (result.code) {
-      _body = result
-    }
-    else {
-      _body.data = result
-    }
-  }
-  catch (e) {
-    _body = error.SERVER_EORROR
-    ctx.app.emit('error', e, ctx)
-  }
-  finally {
-    exportFormat.success(ctx, _body)
-  }
-}
-/**
  * 查询新闻
  * @param {Object} ctx  上下文
  * @param {Function} next
@@ -117,5 +69,55 @@ exports.detail = async (ctx, next) => {
     finally {
       exportFormat.success(ctx, _body)
     }
+  }
+}
+
+
+/**
+* 批量新增Yicai新闻
+ * @param {Object} ctx  上下文
+ * @param {Function} next
+*/
+exports.batchAddYicaiNews = async (ctx, next) => {
+  let _body = { code: 200, msg: '批量新增成功' }
+  try {
+    let result = await news.batchAddYicaiNews()
+    if (result.code) {
+      _body = result
+    }
+    else {
+      _body.data = result
+    }
+  }
+  catch (e) {
+    _body = error.SERVER_EORROR
+    ctx.app.emit('error', e, ctx)
+  }
+  finally {
+    exportFormat.success(ctx, _body)
+  }
+}
+/**
+* 批量新增新闻
+ * @param {Object} ctx  上下文
+ * @param {Function} next
+*/
+exports.batchAddYicaiData = async (ctx, next) => {
+  let _body = { code: 200, msg: '批量新增成功' }
+  try {
+    let result = await news.batchAddYicaiData()
+    if (result.code) {
+      _body = result
+    }
+    else {
+      _body.data = result
+    }
+  }
+  catch (e) {
+    _body = error.SERVER_EORROR
+    ctx.app.emit('error', e, ctx)
+  }
+  finally {
+    exportFormat.success(ctx, _body)
   }
 }
